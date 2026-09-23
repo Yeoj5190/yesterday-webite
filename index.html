@@ -1052,19 +1052,38 @@ html body .music .eq i{background:#5D6E21}
 </section>
 <script>
 (function(){
+  var URL='https://hjxwjddvazewtwkxsbpw.supabase.co/rest/v1/signups';
+  var KEY='sb_publishable_QBxqpM-yUWvjwEs4zZFtzw_wFqVnYIw';
+  function save(email, source){
+    return fetch(URL,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({email:String(email).trim().toLowerCase(), source:source})})
+      .then(function(r){ if(r.ok||r.status===409) return true; throw new Error('signup '+r.status); });
+  }
+  window.__submitSignup=function(form, input, source){
+    var btn=form.querySelector('button'), note=form.querySelector('.band-note'), label=btn.textContent;
+    btn.disabled=true; btn.textContent='Saving…';
+    save(input.value, source).then(function(){
+      form.querySelector('.band-row').hidden=true; if(note) note.hidden=true; form.querySelector('.band-done').hidden=false;
+    }).catch(function(){
+      btn.disabled=false; btn.textContent=label;
+      if(note){ note.hidden=false; note.textContent='Something went wrong. Please try again.'; }
+    });
+  };
+})();
+</script>
+<script>
+(function(){
   document.addEventListener('DOMContentLoaded',function(){ var f2=document.getElementById('earlySignup');
   if(f2){ var i2=f2.querySelector('input'); f2.addEventListener('submit',function(e){ e.preventDefault();
     if(!i2.value||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(i2.value)){ i2.focus(); i2.setAttribute('aria-invalid','true'); return; }
     i2.removeAttribute('aria-invalid');
-    /* TODO: send i2.value (and window.__shell) to your email list here */
-    f2.querySelector('.band-row').hidden=true; f2.querySelector('.band-note').hidden=true; f2.querySelector('.band-done').hidden=false; }); } });
+    window.__submitSignup(f2, i2, 'learn-more'); }); } });
   var f=document.getElementById('bandForm'), i=document.getElementById('bandEmail'); if(!f) return;
   f.addEventListener('submit',function(e){
     e.preventDefault();
     if(!i.value||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(i.value)){ i.focus(); i.setAttribute('aria-invalid','true'); return; }
     i.removeAttribute('aria-invalid');
-    /* TODO: send i.value (and window.__shell) to your email list here */
-    f.querySelector('.band-row').hidden=true; f.querySelector('.band-note').hidden=true; f.querySelector('.band-done').hidden=false;
+    window.__submitSignup(f, i, 'band');
   });
   document.addEventListener('click',function(e){
     var a=e.target.closest('.js-signup'); if(!a) return; e.preventDefault();
