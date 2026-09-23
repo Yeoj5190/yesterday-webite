@@ -1246,9 +1246,19 @@ html.locked .fseg{visibility:hidden}
   function resumeBg(force){ clearTimeout(blurT); if(resumeOnShow && !muted && !document.hidden && (force || inFrame || document.hasFocus()) && Date.now()-lastStop>800){ resumeOnShow=false; a.muted=false; a.play().catch(function(){}); } }
   document.addEventListener('visibilitychange',function(){ if(document.hidden) stopBg(); else resumeBg(true); });
   window.addEventListener('pagehide',stopBg);
-  window.addEventListener('blur',function(){ clearTimeout(blurT); blurT=setTimeout(function(){ if(!document.hasFocus()) stopBg(); }, inFrame?1500:500); });
+  window.addEventListener('blur',function(){ clearTimeout(blurT); blurT=setTimeout(function(){ if(sawFocus && !document.hasFocus()) stopBg(); }, inFrame?1500:500); });
   window.addEventListener('focus',function(){ resumeBg(false); });
   document.addEventListener('pointerdown',function(){ if(resumeOnShow) resumeBg(true); },{passive:true});
+  // watchdog: works even when the host never sends visibility/focus events (throttled or embedded views)
+  var lastTick=performance.now(), goodTicks=0, awayTicks=0, sawFocus=false;
+  (function tick(){ lastTick=performance.now(); requestAnimationFrame(tick); })();
+  setInterval(function(){
+    var focused=document.hasFocus(); if(focused) sawFocus=true;
+    var hard = document.hidden || (performance.now()-lastTick>1500);
+    var soft = sawFocus && !focused;
+    if(hard || (soft && ++awayTicks>=3)){ goodTicks=0; if(!a.paused) stopBg(); }
+    else if(!soft){ awayTicks=0; if(resumeOnShow && ++goodTicks>=3) resumeBg(true); }
+  },400);
   a.volume=0;
   function fade(to){ var from=a.volume, t0=performance.now(); (function s(){ var k=Math.min(1,(performance.now()-t0)/900); a.volume=from+(to-from)*k; if(k<1) requestAnimationFrame(s); else if(to===0) a.pause(); })(); }
   function ui(){ var on=!a.paused&&!muted; btn.classList.toggle('playing',on); btn.setAttribute('aria-pressed',on); lbl.textContent=on?'Sound on':(muted?'Sound off':'Tap for sound'); }
