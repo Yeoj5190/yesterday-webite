@@ -1223,12 +1223,12 @@ html.locked .fseg{visibility:hidden}
   var a=document.getElementById('song'), btn=document.getElementById('musicBtn'), lbl=document.getElementById('musicLbl'), muted=false;
   var resumeOnShow=false, inFrame=(window.top!==window.self), blurT=null;
   function stopBg(){ if(!a.paused){ a.pause(); resumeOnShow=!muted; } }
-  function resumeBg(){ clearTimeout(blurT); if(resumeOnShow && !muted && !document.hidden && (inFrame || document.hasFocus())){ resumeOnShow=false; a.play().catch(function(){}); } }
-  document.addEventListener('visibilitychange',function(){ if(document.hidden) stopBg(); else resumeBg(); });
+  function resumeBg(force){ clearTimeout(blurT); if(resumeOnShow && !muted && !document.hidden && (force || inFrame || document.hasFocus())){ resumeOnShow=false; a.play().catch(function(){}); } }
+  document.addEventListener('visibilitychange',function(){ if(document.hidden) stopBg(); else resumeBg(true); });
   window.addEventListener('pagehide',stopBg);
   if(!inFrame){
     window.addEventListener('blur',function(){ clearTimeout(blurT); blurT=setTimeout(function(){ if(!document.hasFocus()) stopBg(); },500); });
-    window.addEventListener('focus',resumeBg);
+    window.addEventListener('focus',function(){ resumeBg(false); });
   }
   a.volume=0;
   function fade(to){ var from=a.volume, t0=performance.now(); (function s(){ var k=Math.min(1,(performance.now()-t0)/900); a.volume=from+(to-from)*k; if(k<1) requestAnimationFrame(s); else if(to===0) a.pause(); })(); }
