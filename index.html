@@ -541,6 +541,22 @@ section.band .band-done{margin-top:12px}
   .early .band-row{background:transparent;border:0;border-bottom:1.5px solid #0F0E12;border-radius:0;padding:0 0 12px;min-height:0}
 }
 </style>
+<style>
+/* phone hero, layout A: photo on top, words on black below */
+@media (max-width:760px){
+  html body .tvhero.hero{min-height:0;justify-content:flex-start;padding:0 20px 36px;gap:0}
+  html body .tvhero .tv{position:relative;inset:auto;height:54svh;min-height:380px;max-height:470px;margin:0 -20px;z-index:0}
+  html body .tvhero .tv .scrim{background:linear-gradient(180deg,rgba(15,14,17,.55) 0%,rgba(15,14,17,0) 28%,rgba(15,14,17,0) 68%,#0F0E11 100%)}
+  html body .tvhero .copy{position:relative;z-index:2;padding:10px 0 0;order:1}
+  html body .tvhero .tv{order:0}
+  html body .osd{top:calc(min(max(54svh,380px),470px) - 92px)!important;bottom:auto!important;right:16px!important}
+  html body .tvhero h1{font-size:clamp(34px,10vw,42px);line-height:1.02;margin-top:12px}
+  html body .tvhero .sub{font-size:15.5px;margin-top:12px}
+  html body .tvhero .sub .sub-more{display:none}
+  html body .tvhero .sub br{display:none}
+  html body .tvhero .cta-row{margin-top:20px}
+}
+</style>
 </head><body><script>document.documentElement.classList.add("pregate")</script><style>html,body{background:#050506}html.pregate body>*:not(#gate):not(style):not(script):not(link){visibility:hidden!important}</style><style>
 .gate{position:fixed;inset:0;z-index:89;background:#050506;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;padding:24px;transition:opacity .35s ease,visibility .35s;overflow:hidden}
 .gate.gone{opacity:0;visibility:hidden}
@@ -938,7 +954,7 @@ html body .music .eq i{background:#5D6E21}
   <div class="copy">
     <div class="eyebrow mono"><i></i>Launching October</div>
     <h1>Today is about to become yesterday.</h1>
-    <p class="sub">A pocket camera for the nights you&rsquo;ll want back. <br>Real flash. 36 photos. No screen. <br>Shoot first. Stay in the moment. Plug it into your phone or laptop later and your 36 photos are ready in seconds.</p>
+    <p class="sub">A pocket camera for the nights you&rsquo;ll want back. <br>Real flash. 36 photos. No screen. <span class="sub-more"><br>Shoot first. Stay in the moment. Plug it into your phone or laptop later and your 36 photos are ready in seconds.</span></p>
     <div class="cta-row">
       <a class="btn js-early" href="#early">Learn more</a>
     </div>
@@ -1151,9 +1167,9 @@ html.locked .fseg{visibility:hidden}
     <div class="early-cams"><img src="assets/18-92544ec988.webp" alt=""><img src="assets/19-3eeb7d58ce.webp" alt=""><img src="assets/20-4ff459c375.webp" alt=""></div>
     <h2 class="early-h" id="earlyTitle">You have 36 shots.<br>Make them count.</h2>
     <div class="early-steps">
-      <div><span class="mono">01</span><h3>Take 36 photos</h3><p>Then it&rsquo;s full. No screen, so nothing gets checked or deleted mid night. You keep shooting.</p></div>
-      <div><span class="mono">02</span><h3>Plug it into your phone or laptop</h3><p>Any cable, whenever you&rsquo;re home. The photos copy across the moment it connects.</p></div>
-      <div><span class="mono">03</span><h3>They&rsquo;re on your phone in seconds</h3><p>All 36 at full size, on whatever you plugged it into. No app, no account.</p></div>
+      <div><span class="mono">01</span><h3>Shoot all 36</h3><p>No screen. No checking. No deleting. Just keep shooting until the night&rsquo;s done.</p></div>
+      <div><span class="mono">02</span><h3>Plug it in</h3><p>When you&rsquo;re ready, connect the camera to your phone or laptop. That&rsquo;s it.</p></div>
+      <div><span class="mono">03</span><h3>The whole night, in seconds</h3><p>All 36 photos transfer straight to your device. No app. No account. No waiting.</p></div>
     </div>
     <div class="early-signup">
       <p class="early-launch">Be there <mark>when it launches.</mark></p>
