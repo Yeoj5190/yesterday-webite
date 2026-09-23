@@ -1241,8 +1241,9 @@ html.locked .fseg{visibility:hidden}
 (function(){
   var a=document.getElementById('song'), btn=document.getElementById('musicBtn'), lbl=document.getElementById('musicLbl'), muted=false;
   var resumeOnShow=false, inFrame=(window.top!==window.self), blurT=null;
-  function stopBg(){ if(!a.paused){ a.pause(); resumeOnShow=!muted; } }
-  function resumeBg(force){ clearTimeout(blurT); if(resumeOnShow && !muted && !document.hidden && (force || inFrame || document.hasFocus())){ resumeOnShow=false; a.play().catch(function(){}); } }
+  var lastStop=0;
+  function stopBg(){ a.muted=true; lastStop=Date.now(); if(!a.paused){ a.pause(); resumeOnShow=!muted; } }
+  function resumeBg(force){ clearTimeout(blurT); if(resumeOnShow && !muted && !document.hidden && (force || inFrame || document.hasFocus()) && Date.now()-lastStop>800){ resumeOnShow=false; a.muted=false; a.play().catch(function(){}); } }
   document.addEventListener('visibilitychange',function(){ if(document.hidden) stopBg(); else resumeBg(true); });
   window.addEventListener('pagehide',stopBg);
   window.addEventListener('blur',function(){ clearTimeout(blurT); blurT=setTimeout(function(){ if(!document.hasFocus()) stopBg(); }, inFrame?1500:500); });
@@ -1251,11 +1252,11 @@ html.locked .fseg{visibility:hidden}
   a.volume=0;
   function fade(to){ var from=a.volume, t0=performance.now(); (function s(){ var k=Math.min(1,(performance.now()-t0)/900); a.volume=from+(to-from)*k; if(k<1) requestAnimationFrame(s); else if(to===0) a.pause(); })(); }
   function ui(){ var on=!a.paused&&!muted; btn.classList.toggle('playing',on); btn.setAttribute('aria-pressed',on); lbl.textContent=on?'Sound on':(muted?'Sound off':'Tap for sound'); }
-  function start(){ if(muted) return; a.play().then(function(){ fade(.7); ui(); }).catch(ui); }
+  function start(){ if(muted||document.hidden) return; a.muted=false; a.preload='auto'; a.play().then(function(){ fade(.7); ui(); }).catch(ui); }
   window.__music={ start:start, muted:function(){return muted}, setMuted:function(m){ muted=m; if(m){ if(!a.paused) fade(0); } ui(); } };
   window.__startSong=start;
   btn.addEventListener('click',function(){
-    if(a.paused||muted){ muted=false; a.play().then(function(){fade(.7);ui();}); }
+    if(a.paused||muted){ muted=false; resumeOnShow=false; a.muted=false; a.play().then(function(){fade(.7);ui();}); }
     else { muted=true; fade(0); setTimeout(ui,50); }
     ui(); document.dispatchEvent(new Event('soundchange'));
   });
