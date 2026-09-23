@@ -1221,11 +1221,15 @@ html.locked .fseg{visibility:hidden}
 <script>
 (function(){
   var a=document.getElementById('song'), btn=document.getElementById('musicBtn'), lbl=document.getElementById('musicLbl'), muted=false;
-  var resumeOnShow=false;
-  document.addEventListener('visibilitychange',function(){
-    if(document.hidden){ if(!a.paused){ a.pause(); resumeOnShow=true; } }
-    else if(resumeOnShow){ resumeOnShow=false; a.play().catch(function(){}); }
-  });
+  var resumeOnShow=false, inFrame=(window.top!==window.self), blurT=null;
+  function stopBg(){ if(!a.paused){ a.pause(); resumeOnShow=!muted; } }
+  function resumeBg(){ clearTimeout(blurT); if(resumeOnShow && !muted && !document.hidden && (inFrame || document.hasFocus())){ resumeOnShow=false; a.play().catch(function(){}); } }
+  document.addEventListener('visibilitychange',function(){ if(document.hidden) stopBg(); else resumeBg(); });
+  window.addEventListener('pagehide',stopBg);
+  if(!inFrame){
+    window.addEventListener('blur',function(){ clearTimeout(blurT); blurT=setTimeout(function(){ if(!document.hasFocus()) stopBg(); },500); });
+    window.addEventListener('focus',resumeBg);
+  }
   a.volume=0;
   function fade(to){ var from=a.volume, t0=performance.now(); (function s(){ var k=Math.min(1,(performance.now()-t0)/900); a.volume=from+(to-from)*k; if(k<1) requestAnimationFrame(s); else if(to===0) a.pause(); })(); }
   function ui(){ var on=!a.paused&&!muted; btn.classList.toggle('playing',on); btn.setAttribute('aria-pressed',on); lbl.textContent=on?'Sound on':(muted?'Sound off':'Tap for sound'); }
